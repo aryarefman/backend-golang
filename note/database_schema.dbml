@@ -1,0 +1,50 @@
+// Tabel ini menyimpan informasi akun pengguna.
+Table accounts as A {
+  id bigserial [pk] // "Primary key" untuk akun(pk), otomatis bertambah(bigserial/PostgreSQL).
+                    // tipe data: bigserial.
+                    // dalam PostgreSQL bigserial bertujuan untuk menambah nilai id tanpa harus diubah manual.
+  owner varchar [not null] // Nama pemilik akun, tidak boleh kosong(not null).
+                           // tipe data: varchar.
+  balance bigint [not null] // Saldo akun dalam mata uang tertentu, tidak boleh kosong(not null).
+                            // tipe data: big int -> int, tetapi memeliki kapasitas penyimpanan lebih besar.
+  currency varchar [not null] // Jenis mata uang yang digunakan dalam akun, tidak boleh kosong(not null).
+                              // tipe data: varchar
+  created_code timestampz [not null, default: 'now()'] // Waktu pembuatan akun, default 'now()'.
+                                                       // tidak boleh kosong(not null).
+                                                       // tipe data: timestampz (jika ingin menggunakan zona waktu yg berbeda)
+                                                       // default: 'now()' -> mengisi otomatis waktu
+
+  indexes {
+    owner // Membuat indeks untuk pemilik akun agar pencarian lebih cepat.
+  }
+}
+
+// Tabel ini mencatat semua perubahan saldo akun.
+Table entries {
+  id bigserial [pk]
+  account_id bigint [ref: > A.id] // "Foreign key" yang merujuk ke accounts.id.
+  amount bigint [not null, note: 'can be negative or positive'] // Nilai transaksi, bisa positif (kredit) atau negatif (debit).
+  created_code timestampz [not null, default: 'now()'] // Waktu pencatatan transaksi, default 'now()'.
+
+  indexes {
+    account_id // Membantu pencarian transaksi berdasarkan (account_id) lebih cepat.
+  }
+}
+
+// Tabel ini menyimpan transaksi transfer antar akun.
+Table tranfers {
+  id bigserial [pk]
+  from_account_id bigint [ref: > A.id] // "Foreign key" akun pengirim.
+  to_account_id bigint [ref: > A.id] // "Foreign key" akun penerima.
+  amount bigint [not null, note: 'must be positive'] // Jumlah yang ditransfer, harus positif.
+                                                     // tidak boleh kosong(not null).
+  created_code timestampz [default: 'now()'] // Waktu pencatatan transfer, default 'now()'.
+
+  indexes {
+    from_account_id // Mempercepat pencarian berdasarkan akun pengirim.
+    to_account_id // Mempercepat pencarian berdasarkan akun penerima.
+    (from_account_id, to_account_id) // Indeks gabungan untuk optimasi pencarian transfer antar dua akun.
+  }
+}
+
+// dbdiagram.io bisa tahu relasi antartabel dari ref
