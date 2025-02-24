@@ -1,10 +1,10 @@
 -- Membuat tabel 'accounts' untuk menyimpan data akun pengguna
 CREATE TABLE "accounts" (
-  "id" bigserial PRIMARY KEY,  -- ID unik untuk setiap akun, auto-increment (bigserial = bigint + autoincrement)
+  "id" bigserial PRIMARY KEY,  -- ID unik untuk setiap akun, auto-increment
   "owner" varchar NOT NULL,   -- Nama pemilik akun
   "balance" bigint NOT NULL,  -- Saldo akun
   "currency" varchar NOT NULL, -- Mata uang akun
-  "created_code" timestampz NOT NULL DEFAULT 'now()' -- Waktu pembuatan akun, default ke waktu saat ini
+  "created_at" timestamptz NOT NULL DEFAULT now() -- Waktu pembuatan akun, default ke waktu saat ini
 );
 
 -- Membuat tabel 'entries' untuk mencatat setiap transaksi yang berhubungan dengan akun
@@ -12,7 +12,7 @@ CREATE TABLE "entries" (
   "id" bigserial PRIMARY KEY,  -- ID unik untuk setiap transaksi
   "account_id" bigint,         -- Foreign key ke tabel 'accounts', menghubungkan transaksi dengan akun
   "amount" bigint NOT NULL,    -- Jumlah transaksi, bisa positif atau negatif
-  "created_code" timestampz NOT NULL DEFAULT 'now()' -- Waktu transaksi, default ke waktu saat ini
+  "created_at" timestamptz NOT NULL DEFAULT now() -- Waktu transaksi, default ke waktu saat ini
 );
 
 -- Membuat tabel 'transfers' untuk mencatat transfer antar akun
@@ -21,7 +21,7 @@ CREATE TABLE "transfers" (
   "from_account_id" bigint,    -- Foreign key ke 'accounts', menunjukkan akun pengirim
   "to_account_id" bigint,      -- Foreign key ke 'accounts', menunjukkan akun penerima
   "amount" bigint NOT NULL,    -- Jumlah yang ditransfer, harus positif
-  "created_code" timestampz DEFAULT 'now()' -- Waktu transfer, default ke waktu saat ini
+  "created_at" timestamptz DEFAULT now() -- Waktu transfer, default ke waktu saat ini
 );
 
 -- Membuat indeks untuk meningkatkan kecepatan pencarian berdasarkan 'owner' di tabel accounts

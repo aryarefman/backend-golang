@@ -9,9 +9,9 @@ Table accounts as A {
                             // tipe data: big int -> int, tetapi memeliki kapasitas penyimpanan lebih besar.
   currency varchar [not null] // Jenis mata uang yang digunakan dalam akun, tidak boleh kosong(not null).
                               // tipe data: varchar
-  created_code timestampz [not null, default: 'now()'] // Waktu pembuatan akun, default 'now()'.
+  created_at timestamptz [not null, default: 'now()'] // Waktu pembuatan akun, default 'now()'.
                                                        // tidak boleh kosong(not null).
-                                                       // tipe data: timestampz (jika ingin menggunakan zona waktu yg berbeda)
+                                                       // tipe data: timestamptz (jika ingin menggunakan zona waktu yg berbeda)
                                                        // default: 'now()' -> mengisi otomatis waktu
 
   indexes {
@@ -22,9 +22,9 @@ Table accounts as A {
 // Tabel ini mencatat semua perubahan saldo akun.
 Table entries {
   id bigserial [pk]
-  account_id bigint [ref: > A.id] // "Foreign key" yang merujuk ke accounts.id.
+  account_id bigint [ref: > A.id, not null] // "Foreign key" yang merujuk ke accounts.id.
   amount bigint [not null, note: 'can be negative or positive'] // Nilai transaksi, bisa positif (kredit) atau negatif (debit).
-  created_code timestampz [not null, default: 'now()'] // Waktu pencatatan transaksi, default 'now()'.
+  created_at timestamptz [not null, default: 'now()'] // Waktu pencatatan transaksi, default 'now()'.
 
   indexes {
     account_id // Membantu pencarian transaksi berdasarkan (account_id) lebih cepat.
@@ -32,13 +32,13 @@ Table entries {
 }
 
 // Tabel ini menyimpan transaksi transfer antar akun.
-Table tranfers {
+Table transfers {
   id bigserial [pk]
-  from_account_id bigint [ref: > A.id] // "Foreign key" akun pengirim.
-  to_account_id bigint [ref: > A.id] // "Foreign key" akun penerima.
+  from_account_id bigint [ref: > A.id, not null] // "Foreign key" akun pengirim.
+  to_account_id bigint [ref: > A.id, not null] // "Foreign key" akun penerima.
   amount bigint [not null, note: 'must be positive'] // Jumlah yang ditransfer, harus positif.
                                                      // tidak boleh kosong(not null).
-  created_code timestampz [default: 'now()'] // Waktu pencatatan transfer, default 'now()'.
+  created_at timestamptz [default: 'now()'] // Waktu pencatatan transfer, default 'now()'.
 
   indexes {
     from_account_id // Mempercepat pencarian berdasarkan akun pengirim.
